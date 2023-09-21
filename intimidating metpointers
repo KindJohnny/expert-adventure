@@ -1,0 +1,68 @@
+#include <cstdio>
+#include <vector>
+
+#include <chrono>
+#include <thread>
+
+template < typename T > 
+struct DynamicInitCommand
+{
+  void (T::*init) ();
+  unsigned ticks;
+};
+
+
+class Frontend
+{
+  private:
+  std::vector<DynamicInitCommand<Frontend> > m_dyninit;
+  
+  unsigned m_initCnt{0};
+  
+  void dynamicInit1(){printf("dynInit1\n");}
+  void dynamicInit2(){printf("dynInit2\n");}
+  void dynamicInit3(){printf("dynInit3\n");} 
+  
+  
+  public:
+  
+  Frontend()
+  {
+  
+  DynamicInitCommand <Frontend> init1,init2,init3;
+  
+  init1 = {&Frontend::dynamicInit1,5};
+  init2 = {&Frontend::dynamicInit2,10};
+  init3 = {&Frontend::dynamicInit3,15};
+  
+  m_dyninit.push_back(init1);
+  m_dyninit.push_back(init2);
+  m_dyninit.push_back(init3);
+  
+  }
+  
+  
+  void tick()
+  {
+      printf("tick:%d \n",++m_ticks);
+
+     auto it = m_dyninit.begin();
+      
+      //for (auto elem: m_dyninit)
+      while(it != m_dyninit.end())
+      {
+          if(it->ticks < m_ticks)
+          {
+              if(it->init)
+                ((*this).*(it->init))();
+               
+                it = m_dyninit.erase(it);    
+          }
+          else
+            it++;
+            
+      }
+  }
+  
+  unsigned m_ticks{0};
+};
