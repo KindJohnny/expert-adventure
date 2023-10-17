@@ -9,3 +9,12 @@ staged    -- "git commit"  --> tracked/committed
 %%комментарий
 ```
 
+
+```mermaid
+  graph TD;
+      A-->B;
+      A-->C;
+      B-->D;
+      C-->D;
+```
+
